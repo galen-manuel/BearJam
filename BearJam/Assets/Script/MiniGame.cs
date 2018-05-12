@@ -33,7 +33,10 @@ public class MiniGame : MonoBehaviour {
 	/* INITIALIZATION */
 
 	protected void Start() {
-		
+		for(int i = Constants.MAX_PLAYER_COUNT - 1; i >= 0; --i) {
+			Messenger.AddListener<InputControlType>(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_PRESSED, i), OnControllerButtonPressed);
+			Messenger.AddListener<InputControlType>(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_RELEASED, i), OnControllerButtonReleased);
+		}
 	}
 
 	/* PROPERTIES */

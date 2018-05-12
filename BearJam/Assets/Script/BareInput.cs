@@ -110,19 +110,39 @@ public class BareInput : MonoBehaviour {
 			}
 			#endregion
 
+			#region Bumpers
 			if(device.LeftBumper.WasPressed) {
-				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_PRESSED, i), InputControlType.DPadUp);
+				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_PRESSED, i), InputControlType.LeftBumper);
 			}
 			else if(device.LeftBumper.WasReleased) {
-				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_RELEASED, i), InputControlType.DPadUp);
+				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_RELEASED, i), InputControlType.LeftBumper);
 			}
 
 			if(device.RightBumper.WasPressed) {
-				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_PRESSED, i), InputControlType.DPadDown);
+				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_PRESSED, i), InputControlType.RightBumper);
 			}
 			else if(device.RightBumper.WasReleased) {
-				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_RELEASED, i), InputControlType.DPadDown);
+				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_RELEASED, i), InputControlType.RightBumper);
 			}
+			#endregion
+
+			#region Triggers
+			if(device.LeftTrigger.WasPressed) {
+				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_PRESSED, i), InputControlType.LeftTrigger);
+			}
+			else if(device.LeftTrigger.WasReleased) {
+				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_RELEASED, i), InputControlType.LeftTrigger);
+			}
+
+			if(device.RightTrigger.WasPressed) {
+				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_PRESSED, i), InputControlType.RightTrigger);
+			}
+			else if(device.RightTrigger.WasReleased) {
+				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_RELEASED, i), InputControlType.RightTrigger);
+			}
+			#endregion
+
+
 		}
 	}
 
