@@ -27,7 +27,9 @@ public class BareInput : MonoBehaviour {
 
 		for(int i = InputManager.Devices.Count - 1; i >= 0; --i) {
 			Debug.LogFormat("Device {0} Name: {1}", i, InputManager.Devices[0].Name);
-			_activeDevices.Add(InputManager.Devices[i]);
+			if(InputManager.Devices[i].IsAttached) {
+				_activeDevices.Add(InputManager.Devices[i]);
+			}
 		}
 
 		if(_activeDevices.Count == 0) {
@@ -46,34 +48,67 @@ public class BareInput : MonoBehaviour {
 	private void Update() {
 		for(int i = _activeDevices.Count - 1; i >= 0; --i) {
 			var device = _activeDevices[i];
+			Debug.Log("Checking device " + device.Name);
 
-			if (device.Action1.IsPressed) {
+			#region Action Buttons
+			if(device.Action1.WasPressed) {
 				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_PRESSED, i), InputControlType.Action1);
 			}
-			else if (device.Action1.WasReleased) {
+			else if(device.Action1.WasReleased) {
 				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_RELEASED, i), InputControlType.Action1);
 			}
 
-			if(device.Action2.IsPressed) {
+			if(device.Action2.WasPressed) {
 				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_PRESSED, i), InputControlType.Action2);
 			}
 			else if(device.Action2.WasReleased) {
 				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_RELEASED, i), InputControlType.Action2);
 			}
 
-			if(device.Action3.IsPressed) {
+			if(device.Action3.WasPressed) {
 				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_PRESSED, i), InputControlType.Action3);
 			}
 			else if(device.Action3.WasReleased) {
 				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_RELEASED, i), InputControlType.Action3);
 			}
 
-			if(device.Action4.IsPressed) {
+			if(device.Action4.WasPressed) {
 				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_PRESSED, i), InputControlType.Action4);
 			}
 			else if(device.Action4.WasReleased) {
 				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_RELEASED, i), InputControlType.Action4);
 			}
+			#endregion
+
+			#region D-Pad
+			if(device.DPadUp.WasPressed) {
+				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_PRESSED, i), InputControlType.DPadUp);
+			}
+			else if(device.DPadUp.WasReleased) {
+				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_RELEASED, i), InputControlType.DPadUp);
+			}
+
+			if(device.DPadDown.WasPressed) {
+				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_PRESSED, i), InputControlType.DPadDown);
+			}
+			else if(device.DPadDown.WasReleased) {
+				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_RELEASED, i), InputControlType.DPadDown);
+			}
+
+			if(device.DPadLeft.WasPressed) {
+				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_PRESSED, i), InputControlType.DPadLeft);
+			}
+			else if(device.DPadLeft.WasReleased) {
+				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_RELEASED, i), InputControlType.DPadLeft);
+			}
+
+			if(device.DPadRight.WasPressed) {
+				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_PRESSED, i), InputControlType.DPadRight);
+			}
+			else if(device.DPadRight.WasReleased) {
+				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_RELEASED, i), InputControlType.DPadRight);
+			}
+			#endregion
 		}
 	}
 

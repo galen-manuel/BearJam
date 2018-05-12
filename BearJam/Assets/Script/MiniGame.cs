@@ -6,6 +6,13 @@ using System.Collections.Generic;
 public class MiniGame : MonoBehaviour {
 	/* ENUMS */
 
+	public enum Type{
+		Defined_Sequence, // press a pre-defined sequnce of input tasks
+		Random_Sequence, // press a random-defined sequence of input tasks
+		ABDecision, // press a single button sequence
+		Movement,
+		Patience
+	}
 
 	/* CONSTANTS */
 
@@ -13,15 +20,19 @@ public class MiniGame : MonoBehaviour {
 	/* PUBLIC VARS */
 
 	public string instruction;
-	private Queue<InputControlType> _performedActions;
-	private InputDevice _activeDevice;
+
+	protected Queue<InputTask> _actionsToPerform;
+	// Input task - Data class holding a control type and action?
+	// this is a series of input
 
 	/* PRIVATE VARS */
 
+	protected bool _isComplete;
+	protected float _timeToComplete;
 
 	/* INITIALIZATION */
 
-	private void Start() {
+	protected void Start() {
 		
 	}
 
@@ -29,6 +40,12 @@ public class MiniGame : MonoBehaviour {
 
 
 	/* PUBLIC FUNCTIONS */
+	protected void Update() {
+		_timeToComplete -= Time.deltaTime;
+		if (_timeToComplete <= 0f) {
+			_isComplete = false;
+		}
+	}
 
 
 	/* PRIVATE FUNCTIONS */
@@ -36,11 +53,23 @@ public class MiniGame : MonoBehaviour {
 
 	/* EVENT HANDLERS */
 
-	private void OnControllerButtonPressed(InputControlType pButton) {
+	protected void OnControllerButtonPressed(InputControlType pButton) {
 		Debug.LogFormat("Controller button {0} was pressed", pButton);
+		if (pButton == _actionsToPerform.Peek().controlType) {
+			if(_actionsToPerform.Peek().inputType == InputTask.Type.PressHold) {
+
+			}
+			else {
+				_actionsToPerform.Dequeue();
+			}
+		}
+
+		if (_actionsToPerform.Count == 0) {
+			// Action complete.
+		}
 	}
 
-	private void OnControllerButtonReleased(InputControlType pButton) {
+	protected void OnControllerButtonReleased(InputControlType pButton) {
 		Debug.LogFormat("Controller button {0} was released", pButton);
 	}
 }
