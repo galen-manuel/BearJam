@@ -48,7 +48,6 @@ public class BareInput : MonoBehaviour {
 	private void Update() {
 		for(int i = _activeDevices.Count - 1; i >= 0; --i) {
 			var device = _activeDevices[i];
-			Debug.Log("Checking device " + device.Name);
 
 			#region Action Buttons
 			if(device.Action1.WasPressed) {
@@ -142,7 +141,21 @@ public class BareInput : MonoBehaviour {
 			}
 			#endregion
 
+			#region Joystick Buttons
+			if(device.LeftStickButton.WasPressed) {
+				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_PRESSED, i), InputControlType.LeftStickButton);
+			}
+			else if(device.LeftStickButton.WasReleased) {
+				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_RELEASED, i), InputControlType.LeftStickButton);
+			}
 
+			if(device.RightStickButton.WasPressed) {
+				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_PRESSED, i), InputControlType.RightStickButton);
+			}
+			else if(device.RightStickButton.WasReleased) {
+				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_RELEASED, i), InputControlType.RightStickButton);
+			}
+			#endregion
 		}
 	}
 
