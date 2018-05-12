@@ -109,6 +109,20 @@ public class BareInput : MonoBehaviour {
 				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_RELEASED, i), InputControlType.DPadRight);
 			}
 			#endregion
+
+			if(device.LeftBumper.WasPressed) {
+				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_PRESSED, i), InputControlType.DPadUp);
+			}
+			else if(device.LeftBumper.WasReleased) {
+				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_RELEASED, i), InputControlType.DPadUp);
+			}
+
+			if(device.RightBumper.WasPressed) {
+				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_PRESSED, i), InputControlType.DPadDown);
+			}
+			else if(device.RightBumper.WasReleased) {
+				Messenger.Broadcast(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_RELEASED, i), InputControlType.DPadDown);
+			}
 		}
 	}
 
