@@ -1,44 +1,34 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class InputTask {
-	/* ENUMS */
-
-	public enum Type {
-		PressRelease,
-		PressHold,
-		JoystickMovement
-	}
-
-	/* CONSTANTS */
-
-
+public class InputAction {
 	/* PUBLIC VARS */
-
 	public InControl.InputControlType controlType;
-	public Type inputType;
-	public float holdTime;
-
-	/* PRIVATE VARS */
-
 
 	/* INITIALIZATION */
-
-	public InputTask(InControl.InputControlType pControlType, Type pInputType, float pHoldTime = -1) {
+	public InputAction(InControl.InputControlType pControlType) {
 		controlType = pControlType;
-		inputType = pInputType;
+	}
+}
+
+public class ButtonAction : InputAction {
+	/* PUBLIC VARS */
+	public bool isHold;
+	public float holdTime;
+
+	/* INITIALIZATION */
+	public ButtonAction(InControl.InputControlType pControlType, bool pIsHold = false, float pHoldTime = 0f)
+		: base(pControlType) {
+		isHold = pIsHold;
 		holdTime = pHoldTime;
 	}
+}
 
-	/* PROPERTIES */
+public class JoystickAction : InputAction {
+	/* PUBLIC VARS */
 
+	/* INITIALIZATION */
+	public JoystickAction(InControl.InputControlType pControlType) : base(pControlType) {
 
-	/* PUBLIC FUNCTIONS */
-
-
-	/* PRIVATE FUNCTIONS */
-
-
-	/* EVENT HANDLERS */
-
+	}
 }

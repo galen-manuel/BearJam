@@ -3,51 +3,69 @@ using System.Collections;
 using InControl;
 using System.Collections.Generic;
 
-public class MiniGame : MonoBehaviour {
+[System.Serializable]
+public class MiniGame {
 	/* ENUMS */
 
-	public enum Type{
-		Defined_Sequence, // press a pre-defined sequnce of input tasks
-		Random_Sequence, // press a random-defined sequence of input tasks
-		ABDecision, // press a single button sequence
-		Movement,
-		Patience
-	}
-
 	/* CONSTANTS */
+	private const float TIME_TO_COMPLETE = 5.0f;
 
 
 	/* PUBLIC VARS */
 
-	public string instruction;
-
-	protected Queue<InputTask> _actionsToPerform;
-	// Input task - Data class holding a control type and action?
-	// this is a series of input
-
 	/* PRIVATE VARS */
+	protected Queue<InputAction> _task;
+	protected InputControlType[] _availableControls;
+	protected string _instructions;
+	private int _playerIndex;
+	private float _timer;
 
-	protected bool _isComplete;
-	protected float _timeToComplete;
+	/* PROPERTIES */
+	public string Instructions {
+		get { return _instructions; }
+	}
 
 	/* INITIALIZATION */
+	public MiniGame(int pPlayerIndex) {
+		_playerIndex = pPlayerIndex;
+		_timer = 0f;
 
-	protected void Start() {
-		for(int i = Constants.MAX_PLAYER_COUNT - 1; i >= 0; --i) {
-			Messenger.AddListener<InputControlType>(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_PRESSED, i), OnControllerButtonPressed);
-			Messenger.AddListener<InputControlType>(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_RELEASED, i), OnControllerButtonReleased);
-		}
+		_availableControls = new InputControlType[] {
+			InputControlType.Action1,
+			InputControlType.Action2,
+			InputControlType.Action3,
+			InputControlType.Action4,
+			InputControlType.DPadUp,
+			InputControlType.DPadDown,
+			InputControlType.DPadLeft,
+			InputControlType.DPadRight,
+			InputControlType.LeftBumper,
+			InputControlType.RightBumper,
+			InputControlType.LeftTrigger,
+			InputControlType.RightTrigger,
+			InputControlType.LeftStickButton,
+			InputControlType.RightStickButton,
+		};
+
+		Messenger.AddListener<InputControlType>(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_PRESSED, _playerIndex),
+			OnControllerButtonPressed);
+		Messenger.AddListener<InputControlType>(string.Format("{0}{1}", Messages.CONTROLLER_BUTTON_RELEASED, _playerIndex),
+			OnControllerButtonReleased);
 	}
 
 	/* PROPERTIES */
 
-
 	/* PUBLIC FUNCTIONS */
-	protected void Update() {
-		_timeToComplete -= Time.deltaTime;
-		if (_timeToComplete <= 0f) {
-			_isComplete = false;
+	public void Update(float pDt) {
+		_timer += pDt;
+		if(_timer >= TIME_TO_COMPLETE) {
+			Messenger.Broadcast(Messages.MINI_GAME_COMPLETE, false);
 		}
+	}
+
+	public InputControlType GetRandomControl() {
+		int randIndex = Random.Range(0, _availableControls.Length);
+		return _availableControls[randIndex];
 	}
 
 
@@ -58,17 +76,17 @@ public class MiniGame : MonoBehaviour {
 
 	protected void OnControllerButtonPressed(InputControlType pButton) {
 		Debug.LogFormat("Controller button {0} was pressed", pButton);
-		if (pButton == _actionsToPerform.Peek().controlType) {
-			if(_actionsToPerform.Peek().inputType == InputTask.Type.PressHold) {
-
+		if(pButton == _task.Peek().controlType) {
+			if(_task.Peek().GetType() == typeof(JoystickAction)) {
+				Debug.Log("Joystick Task Detected");
 			}
 			else {
-				_actionsToPerform.Dequeue();
+				_task.Dequeue();
 			}
 		}
 
-		if (_actionsToPerform.Count == 0) {
-			// Action complete.
+		if(_task.Count == 0) {
+			Messenger.Broadcast(Messages.MINI_GAME_COMPLETE, true);
 		}
 	}
 
