@@ -1,4 +1,4 @@
-public class MiniGameRandomSequence : MiniGame {
+public class MiniGameQTE : MiniGame {
 	/* PRIVATE VARIABLES */
 	private int _sequenceLength;
 
@@ -8,7 +8,7 @@ public class MiniGameRandomSequence : MiniGame {
 	}
 
 	/* INITIALIZATION */
-	public MiniGameRandomSequence(int pPlayerIndex) : base(pPlayerIndex) {
+	public MiniGameQTE(int pPlayerIndex) : base(pPlayerIndex) {
 		_instructions = "Complete the Sequence!";
 		_sequenceLength = 0;
 

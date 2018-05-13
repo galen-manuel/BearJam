@@ -1,9 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class ViewMiniGame : MonoBehaviour {
 	/* PUBLIC VARIABLES */
+	public TextMeshProUGUI instructions;
+
+	/* PRIVATE VARS */
 	private Constants.GameType _currentGameType;
 	private MiniGame _currentGame;
 	private MiniGameFactory _miniGameFactory;
@@ -19,16 +23,16 @@ public class ViewMiniGame : MonoBehaviour {
 	}
 
 	void Update() {
-		if(_currentGame != null) {
-			_currentGame.Update(Time.deltaTime);
-		}
+		_currentGame?.Update(Time.deltaTime);
 	}
 
 	/* PRIVATE METHODS */
 	private void SpawnNewMiniGame() {
 		_currentGameType = (Constants.GameType)Random.Range(0, (int)Constants.GameType.AllTypes);
-		_currentGameType = Constants.GameType.RandomSequence;
-		_currentGame = _miniGameFactory.CreateMiniGame(Constants.GameType.RandomSequence);
+		_currentGameType = Constants.GameType.QuickTimeEvent;
+		_currentGame = _miniGameFactory.CreateMiniGame(Constants.GameType.QuickTimeEvent);
+
+		instructions.text = _currentGame.Instructions;
 	}
 
 	/* EVENT HANDLERS */
