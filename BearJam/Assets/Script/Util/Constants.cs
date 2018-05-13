@@ -26,6 +26,7 @@ public class Constants : MonoBehaviour {
 	/* CONSTANTS */
 
 	public const int MAX_PLAYER_COUNT = 4;
+	public const float TIME_OF_DAY_TRANSITION_TIME = 2.0f;
 
 	/* PUBLIC VARS */
 

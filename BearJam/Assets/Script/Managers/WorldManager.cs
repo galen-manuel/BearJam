@@ -4,14 +4,14 @@ using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-public class World : MonoBehaviour {
+public class WorldManager : MonoBehaviour {
 	/* ENUMS */
 
 	public enum TimeOfDay {
 		Day = 0,
-		Dawn = 95,
+		Dusk = 90,
 		Night = 180,
-		Dusk = 270,
+		Dawn = 270,
 	}
 
 	/* CONSTANTS */
@@ -45,6 +45,9 @@ public class World : MonoBehaviour {
 	/* INITIALIZATION */
 
 	private void Start() {
+		Messenger.AddListener(Messages.START_GAME, OnStartGame);
+		Messenger.AddListener<TimeOfDay>(Messages.PREPARE_CHANGE_TIME_OF_DAY, OnPrepareChangeTimeOfDay);
+
 		_waterLayerRT.localScale = completelyHideWater ? new Vector3(0.8f, 0.8f, 0.8f) : new Vector3(0.93f, 0.93f, 0.93f);
 		_waterLayerRT.DORotate(new Vector3(0, 0, -360), _dayLength * 3, RotateMode.LocalAxisAdd).SetEase(Ease.Linear).SetLoops(-1);
 
@@ -77,22 +80,7 @@ public class World : MonoBehaviour {
 	/* PUBLIC FUNCTIONS */
 
 	public void DEBBUG_GoToTimeOfDay(int pTime) {
-		GoToTimeOfDay((TimeOfDay)pTime);
-	}
-
-	public void GoToTimeOfDay(TimeOfDay pTimeOfDay) {
-		if(_currentTimeOfDay != pTimeOfDay) {
-			float offset = (int)_currentTimeOfDay - (int)pTimeOfDay;
-			_currentTimeOfDay = pTimeOfDay;
-			// start spinning sequence
-			_cloudTween.timeScale = 5;
-			_waterSequence.timeScale = 10;
-			_skyLayerRT.DORotate(new Vector3(0, 0, (360 * 5) + offset), 2.0f, RotateMode.LocalAxisAdd);
-			//_celestialBodiesLayerRT.DORotate(new Vector3(0, 0, (360 * 5) + offset), 2.0f, RotateMode.LocalAxisAdd);
-			_buildingLayerRT.DORotate(new Vector3(0, 0, (360 * 5) + offset), 2.0f, RotateMode.LocalAxisAdd);
-			_treeLayerRT.DORotate(new Vector3(0, 0, (360 * 5) + offset), 2.0f, RotateMode.LocalAxisAdd);
-			_landLayerRT.DORotate(new Vector3(0, 0, (360 * 5) + offset), 2.0f, RotateMode.LocalAxisAdd).OnComplete(OnTimeOfDaySettled);
-		}
+		OnPrepareChangeTimeOfDay((TimeOfDay)pTime);
 	}
 
 	/* PRIVATE FUNCTIONS */
@@ -105,8 +93,27 @@ public class World : MonoBehaviour {
 		_buildingBounceTween.Play();
 	}
 
+	private void OnPrepareChangeTimeOfDay(TimeOfDay pTimeOfDay) {
+		if(_currentTimeOfDay != pTimeOfDay) {
+			float time = Constants.TIME_OF_DAY_TRANSITION_TIME;
+			float offset = (int)_currentTimeOfDay - (int)pTimeOfDay;
+			_currentTimeOfDay = pTimeOfDay;
+			// start spinning sequence
+			_cloudTween.timeScale = 5;
+			_waterSequence.timeScale = 10;
+			_skyLayerRT.DORotate(new Vector3(0, 0, (360 * 5) + offset), time, RotateMode.LocalAxisAdd);
+			_celestialBodiesLayerRT.DORotate(new Vector3(0, 0, (360 * 5) + offset), 2.0f, RotateMode.LocalAxisAdd);
+			_buildingLayerRT.DORotate(new Vector3(0, 0, (360 * 5) + offset), time, RotateMode.LocalAxisAdd);
+			_treeLayerRT.DORotate(new Vector3(0, 0, (360 * 5) + offset), time, RotateMode.LocalAxisAdd);
+			_landLayerRT.DORotate(new Vector3(0, 0, (360 * 5) + offset), time, RotateMode.LocalAxisAdd).OnComplete(OnTimeOfDaySettled);
+
+			Messenger.Broadcast(Messages.CHANGE_TIME_OF_DAY, pTimeOfDay);
+		}
+	}
+
 	private void OnTimeOfDaySettled() {
 		_cloudTween.timeScale = 1;
 		_waterSequence.timeScale = 1;
+		// Send start mini game?
 	}
 }
