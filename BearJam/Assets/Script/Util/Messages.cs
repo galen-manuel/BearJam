@@ -9,6 +9,8 @@
 	public const string CONTROLLER_BUTTON_PRESSED = "ControllerButtonPressed";
 	public const string CONTROLLER_BUTTON_RELEASED = "ControllerButtonReleased";
 
+	public const string START_GAME = "StartGame";
+
 	/* PUBLIC VARS */
 
 

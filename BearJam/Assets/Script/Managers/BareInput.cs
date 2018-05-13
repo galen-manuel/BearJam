@@ -22,7 +22,7 @@ public class BareInput : MonoBehaviour {
 
 	private void Awake() {
 		if(s_instance == null) {
-			//s_instance
+			s_instance = this;
 
 			DontDestroyOnLoad(gameObject);
 			_activeDevices = new List<InputDevice>();
@@ -39,6 +39,11 @@ public class BareInput : MonoBehaviour {
 
 			if(_activeDevices.Count == 0) {
 				Messenger.Broadcast(Messages.NO_CONTROLLER_CONNECTED);
+			}
+		}
+		else {
+			if (s_instance != this) {
+				Destroy(gameObject);
 			}
 		}
 	}

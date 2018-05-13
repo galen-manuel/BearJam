@@ -20,6 +20,11 @@ public class MainMenu : MonoBehaviour {
 
 	/* INITIALIZATION */
 
+	private void Start() {
+		_currentIndex = 0;
+
+		_buttons[_currentIndex].Select();
+	}
 
 	/* PROPERTIES */
 
