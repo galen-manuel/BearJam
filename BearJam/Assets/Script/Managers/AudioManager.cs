@@ -10,7 +10,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioSource[] _musicSources;
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
 		if (s_Instance == null)
         {
             s_Instance = this;
@@ -68,7 +68,8 @@ public class AudioManager : MonoBehaviour
                 found = true;
                 source.loop = pShouldLoop;
                 source.volume = pVolume;
-                source.PlayOneShot(clip);
+				source.clip = clip;
+                source.Play();
                 break;
             }
         }

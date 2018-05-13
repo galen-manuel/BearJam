@@ -38,6 +38,8 @@ public class World : MonoBehaviour {
 
 	private Sequence _waterSequence;
 	private Tween _cloudTween;
+	private Tween _treeBounceTween;
+	private Tween _buildingBounceTween;
 	private TimeOfDay _currentTimeOfDay;
 
 	/* INITIALIZATION */
@@ -46,8 +48,11 @@ public class World : MonoBehaviour {
 		_waterLayerRT.localScale = completelyHideWater ? new Vector3(0.8f, 0.8f, 0.8f) : new Vector3(0.93f, 0.93f, 0.93f);
 		_waterLayerRT.DORotate(new Vector3(0, 0, -360), _dayLength * 3, RotateMode.LocalAxisAdd).SetEase(Ease.Linear).SetLoops(-1);
 
-		//_skyLayerRT.DORotate(new Vector3(0, 0, 360), _dayLength, RotateMode.LocalAxisAdd).SetEase(Ease.Linear).SetLoops(-1);
 		_cloudTween = _cloudLayerRT.DORotate(new Vector3(0, 0, 360), _dayLength, RotateMode.LocalAxisAdd).SetEase(Ease.Linear).SetLoops(-1);
+		_buildingBounceTween = _buildingLayerRT.DOScale(1.01f, 0.5f).SetEase(Ease.InCirc).SetLoops(-1, LoopType.Yoyo);
+		_buildingBounceTween.Pause();
+		_treeBounceTween = _treeLayerRT.DOScale(1.02f, 0.25f).SetEase(Ease.InCirc).SetLoops(-1, LoopType.Yoyo);
+		_treeBounceTween.Pause();
 
 		_waterSequence = DOTween.Sequence();
 		_waterSequence.InsertCallback(0.0f, () => _wetSandImage.SetAlpha(0.0f));
@@ -94,6 +99,11 @@ public class World : MonoBehaviour {
 
 
 	/* EVENT HANDLERS */
+
+	private void OnStartGame() {
+		_treeBounceTween.Play();
+		_buildingBounceTween.Play();
+	}
 
 	private void OnTimeOfDaySettled() {
 		_cloudTween.timeScale = 1;
