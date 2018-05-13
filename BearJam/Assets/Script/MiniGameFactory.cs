@@ -11,8 +11,8 @@ public class MiniGameFactory {
 	public MiniGame CreateMiniGame(Constants.GameType pType) {
 		MiniGame m = null;
 		switch(pType) {
-			case Constants.GameType.QuickTimeEvent:
-				m = new MiniGameQTE(0);
+			case Constants.GameType.Yoga:
+				m = new MiniGameYoga(0, 10f);
 				break;
 		}
 
