@@ -15,25 +15,31 @@ public class BareInput : MonoBehaviour {
 
 	/* PRIVATE VARS */
 
+	private static BareInput s_instance;
 	private List<InputDevice> _activeDevices;
 
 	/* INITIALIZATION */
 
 	private void Awake() {
-		_activeDevices = new List<InputDevice>();
+		if(s_instance == null) {
+			//s_instance
 
-		InputManager.OnDeviceAttached += OnDeviceAttached;
-		InputManager.OnDeviceDetached += OnDeviceDetached;
+			DontDestroyOnLoad(gameObject);
+			_activeDevices = new List<InputDevice>();
 
-		for(int i = InputManager.Devices.Count - 1; i >= 0; --i) {
-			Debug.LogFormat("Device {0} Name: {1}", i, InputManager.Devices[0].Name);
-			if(InputManager.Devices[i].IsAttached) {
-				_activeDevices.Add(InputManager.Devices[i]);
+			InputManager.OnDeviceAttached += OnDeviceAttached;
+			InputManager.OnDeviceDetached += OnDeviceDetached;
+
+			for(int i = InputManager.Devices.Count - 1; i >= 0; --i) {
+				Debug.LogFormat("Device {0} Name: {1}", i, InputManager.Devices[0].Name);
+				if(InputManager.Devices[i].IsAttached) {
+					_activeDevices.Add(InputManager.Devices[i]);
+				}
 			}
-		}
 
-		if(_activeDevices.Count == 0) {
-			Messenger.Broadcast(Messages.NO_CONTROLLER_CONNECTED);
+			if(_activeDevices.Count == 0) {
+				Messenger.Broadcast(Messages.NO_CONTROLLER_CONNECTED);
+			}
 		}
 	}
 
