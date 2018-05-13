@@ -17,8 +17,8 @@ public class MiniGame {
 	protected Dictionary<Constants.ActionType, InputControlType[]> _availableControls;
 	protected string _instructions;
 	protected float _timeToComplete;
+	protected float _timer;
 	private int _playerIndex;
-	private float _timer;
 	private float _holdTimer;
 	private float _holdTime;
 	private bool _isHoldTimerActive;
@@ -26,6 +26,10 @@ public class MiniGame {
 	/* PROPERTIES */
 	public string Instructions {
 		get { return _instructions; }
+	}
+
+	public float Timer {
+		get { return _timer; }
 	}
 
 	/* INITIALIZATION */

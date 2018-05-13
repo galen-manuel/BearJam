@@ -8,12 +8,14 @@ using DG.Tweening;
 public class ViewMiniGame : MonoBehaviour {
 	/* PUBLIC VARIABLES */
 	[SerializeField] private TextMeshProUGUI _instructions;
+	[SerializeField] private TextMeshProUGUI _debugText;
 	[SerializeField] private RectTransform _inputActionPanel;
 
 	/* PRIVATE VARS */
 	private Constants.GameType _currentGameType;
 	private MiniGame _currentGame;
 	private MiniGameFactory _miniGameFactory;
+	private bool _updateMinigame;
 
 	/* INITIALIZATION */
 	void Awake() {
@@ -27,7 +29,10 @@ public class ViewMiniGame : MonoBehaviour {
 	}
 
 	void Update() {
-		_currentGame?.Update(Time.deltaTime);
+		if(_updateMinigame) {
+			_instructions.text = string.Format("{0} Time: {1}", _currentGame?.Instructions, _currentGame?.Timer.ToString("00.00"));
+			_currentGame?.Update(Time.deltaTime);
+		}
 	}
 
 	/* PRIVATE METHODS */
@@ -49,36 +54,15 @@ public class ViewMiniGame : MonoBehaviour {
 			_currentGameType = (Constants.GameType)Random.Range(0, (int)Constants.GameType.AllTypes);
 			_currentGameType = Constants.GameType.Yoga;
 			_currentGame = _miniGameFactory.CreateMiniGame(Constants.GameType.Yoga);
+			_updateMinigame = true;
 
 			_instructions.text = _currentGame.Instructions;
 
-			if(_currentGame.GetType() == typeof(MiniGameYoga)) {
-				MiniGameYoga game = _currentGame as MiniGameYoga;
-				RectTransform fadedRt = Instantiate(Resources.Load<GameObject>("Prefabs/Controller/" + game.CurrentControl.ToString()), Vector3.zero,
-					 Quaternion.identity, _inputActionPanel).GetComponent<RectTransform>();
-				RectTransform scalingRT = Instantiate(Resources.Load<GameObject>("Prefabs/Controller/" + game.CurrentControl.ToString()), Vector3.zero,
-					 Quaternion.identity, _inputActionPanel).GetComponent<RectTransform>();
-
-				LayoutElement layoutElement = scalingRT.GetComponent<LayoutElement>();
-				layoutElement.ignoreLayout = true;
-
-				fadedRt.localScale = Vector3.zero;
-
-				// Set Properties
-				// scalingRT = fadedRt;
-				scalingRT.gameObject.SetActive(false);
-				StartCoroutine(DeepCopyTransform(scalingRT, fadedRt));
-
-				Image img = fadedRt.GetComponent<Image>();
-				img.SetAlpha(0.5f);
-
-				fadedRt.DOScale(Vector3.one, 0.35f).SetEase(Ease.OutBack);
-				scalingRT.DOScale(Vector3.one, game.TimeToScale).SetDelay(0.5f);
-			}
+			ShowNextInput(_currentGame.GetType());
 		});
-
 	}
-	private IEnumerator DeepCopyTransform(RectTransform scalingRT, RectTransform fadedRt) {
+
+	private IEnumerator DeepCopyLayout(RectTransform scalingRT, RectTransform fadedRt) {
 		yield return new WaitForEndOfFrame();
 
 		scalingRT.localScale = Vector3.zero;
@@ -90,17 +74,67 @@ public class ViewMiniGame : MonoBehaviour {
 
 		scalingRT.gameObject.SetActive(true);
 	}
+
+	private void ShowNextInput(System.Type pType) {
+		if(pType == typeof(MiniGameYoga)) {
+			MiniGameYoga game = _currentGame as MiniGameYoga;
+			game.fadedRT = Instantiate(Resources.Load<GameObject>("Prefabs/Controller/" + game.CurrentControl.ToString()), Vector3.zero,
+						 Quaternion.identity, _inputActionPanel).GetComponent<RectTransform>();
+			game.scalingRT = Instantiate(Resources.Load<GameObject>("Prefabs/Controller/" + game.CurrentControl.ToString()), Vector3.zero,
+				 Quaternion.identity, _inputActionPanel).GetComponent<RectTransform>();
+
+			game.layoutElement = game.scalingRT.GetComponent<LayoutElement>();
+			game.layoutElement.ignoreLayout = true;
+
+			game.fadedRT.localScale = Vector3.zero;
+
+			game.scalingRT.gameObject.SetActive(false);
+			StartCoroutine(DeepCopyLayout(game.scalingRT, game.fadedRT));
+
+			game.fadedImg = game.fadedRT.GetComponent<Image>();
+			game.fadedImg.SetAlpha(0.5f);
+
+			game.fadedRT.DOScale(Vector3.one, 0.35f).SetEase(Ease.OutBack);
+			DOTween.Sequence().InsertCallback(0.5f, () => {
+				_updateMinigame = true;
+				game.scalingRT.DOScale(Vector3.one, game.TimeToScale);
+			});
+		}
+	}
+
 	/* EVENT HANDLERS */
 	private void OnMiniGameStepComplete(System.Type pType) {
-		if(pType == typeof(MiniGameYoga)) {
+		_updateMinigame = false;
 
+		if(pType == typeof(MiniGameYoga)) {
+			MiniGameYoga game = _currentGame as MiniGameYoga;
+			bool isComplete = game.CheckGameComplete();
+
+			_debugText.text = string.Format("Step Complete: PASS");
+
+			if(isComplete) {
+				Messenger.Broadcast(Messages.MINI_GAME_COMPLETE, true);
+			}
+			else {
+				game.fadedRT.DOScale(Vector3.zero, 0.35f).SetEase(Ease.InBack);
+				game.scalingRT.DOScale(Vector3.zero, 0.35f * game.scalingRT.localScale.x / 1.0f).SetEase(Ease.InBack);
+				DOTween.Sequence().InsertCallback(0.45f, () => {
+					Destroy(game.scalingRT.gameObject);
+					Destroy(game.fadedRT.gameObject);
+					ShowNextInput(game.GetType());
+				});
+			}
 		}
 	}
 
 	private void OnMiniGameComplete(bool pDidComplete) {
-		Debug.LogFormat("{0} Mini Game {1}!", System.Enum.GetName(typeof(Constants.GameType), _currentGameType),
-			(pDidComplete ? "Complete" : "Failed"));
+		// Debug.LogFormat("{0} Mini Game {1}!", System.Enum.GetName(typeof(Constants.GameType), _currentGameType),
+		// 	(pDidComplete ? "Complete" : "Failed"));
 
+
+		if(pDidComplete == false) {
+			_debugText.text = string.Format("Step Complete: FAIL");
+		}
 		SpawnNewMiniGame();
 	}
 }
